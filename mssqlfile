@@ -1,0 +1,61 @@
+CREATE TABLE CLIENT (
+    id_client INT IDENTITY PRIMARY KEY,
+    full_name NVARCHAR(100),
+    phone NVARCHAR(20)
+);
+CREATE TABLE ROOM_CATEGORY (
+    id_category INT IDENTITY PRIMARY KEY,
+    name NVARCHAR(50),
+    price INT
+);
+CREATE TABLE ROOM (
+    id_room INT IDENTITY PRIMARY KEY,
+    room_number INT,
+    id_category INT,
+    status NVARCHAR(20),
+    FOREIGN KEY (id_category) REFERENCES ROOM_CATEGORY(id_category)
+);
+CREATE TABLE BOOKING (
+    id_booking INT IDENTITY PRIMARY KEY,
+    id_client INT,
+    id_room INT,
+    date_from DATE,
+    date_to DATE,
+    FOREIGN KEY (id_client) REFERENCES CLIENT(id_client),
+    FOREIGN KEY (id_room) REFERENCES ROOM(id_room)
+);
+CREATE TABLE CHECKIN (
+    id_checkin INT IDENTITY PRIMARY KEY,
+    id_booking INT,
+    checkin_date DATE,
+    checkout_date DATE,
+    FOREIGN KEY (id_booking) REFERENCES BOOKING(id_booking)
+);
+CREATE TABLE CLEANING (
+    id_cleaning INT IDENTITY PRIMARY KEY,
+    id_room INT,
+    cleaning_date DATE,
+    status NVARCHAR(20),
+    FOREIGN KEY (id_room) REFERENCES ROOM(id_room)
+);
+
+INSERT INTO CLIENT (full_name, phone) VALUES
+('test 1', '+111111111'),
+('test 2', '+71102222222');
+
+INSERT INTO ROOM_CATEGORY (name, price) VALUES
+('xl', 2500),
+('xxl', 4500);
+
+INSERT INTO ROOM (room_number, id_category, status) VALUES
+(101, 1, '+'),
+(102, 1, 'yborka'),
+(201, 2, '-');
+
+INSERT INTO BOOKING (id_client, id_room, date_from, date_to) VALUES
+(1, 1, '2026-06-01', '2027-06-05'),
+(2, 3, '2026-06-02', '2027-06-04');
+
+INSERT INTO CLEANING (id_room, cleaning_date, status) VALUES
+(1, '2026-05-30', '+'),
+(2, '2026-05-30', '-');
