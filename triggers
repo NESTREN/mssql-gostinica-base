@@ -1,0 +1,45 @@
+-- триггер 1: проверяет есть ли уборка со статусом "выполнена"
+
+CREATE TRIGGER trg_CheckCleaning
+ON CHECKIN
+INSTEAD OF INSERT
+AS
+BEGIN
+    DECLARE @room_id INT;
+
+    SELECT @room_id = b.id_room
+    FROM inserted i
+    JOIN BOOKING b ON i.id_booking = b.id_booking;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM CLEANING
+        WHERE id_room = @room_id
+        AND status = 'выполнена'
+    )
+    BEGIN
+        PRINT 'Ошибка: номер не убран!';
+        RETURN;
+    END
+
+    INSERT INTO CHECKIN (id_booking, checkin_date, checkout_date)
+    SELECT id_booking, checkin_date, checkout_date
+    FROM inserted;
+END;
+
+-- триггер 2: после выезда номер требует уборки,  автоматически меняет статус номера
+
+CREATE TRIGGER trg_SetCleaningNeeded
+ON CHECKIN
+AFTER UPDATE
+AS
+BEGIN
+    UPDATE ROOM
+    SET status = 'требует уборки'
+    WHERE id_room IN (
+        SELECT b.id_room
+        FROM inserted i
+        JOIN BOOKING b ON i.id_booking = b.id_booking
+        WHERE i.checkout_date IS NOT NULL
+    );
+END;
+
