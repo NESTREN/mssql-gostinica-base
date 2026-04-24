@@ -1,0 +1,33 @@
+-- Процедура 1 — добавить бронирование
+
+  CREATE PROCEDURE AddBooking
+    @client_id INT,
+    @room_id INT,
+    @date_from DATE,
+    @date_to DATE
+AS
+BEGIN
+    INSERT INTO BOOKING (id_client, id_room, date_from, date_to)
+    VALUES (@client_id, @room_id, @date_from, @date_to);
+END;
+
+-- Процедура 2 — выполнить уборку
+-- Вызов:
+EXEC AddBooking 1, 1, '2024-07-01', '2024-07-05';
+
+
+CREATE PROCEDURE DoCleaning
+    @room_id INT
+AS
+BEGIN
+    INSERT INTO CLEANING (id_room, cleaning_date, status)
+    VALUES (@room_id, GETDATE(), 'выполнена');
+
+    UPDATE ROOM
+    SET status = 'свободен'
+    WHERE id_room = @room_id;
+END;
+
+-- Вызов:
+
+EXEC DoCleaning 2;
